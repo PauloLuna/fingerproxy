@@ -21,7 +21,7 @@ var (
 
 type HijackClientHelloConn struct {
 	// internal tls.Conn
-	tlsConn net.Conn
+	TlsConn net.Conn
 
 	// client hello stored in buf
 	buf bytes.Buffer
@@ -35,12 +35,12 @@ type HijackClientHelloConn struct {
 
 func NewHijackClientHelloConn(conn net.Conn) *HijackClientHelloConn {
 	return &HijackClientHelloConn{
-		tlsConn: conn,
+		TlsConn: conn,
 	}
 }
 
 func (c *HijackClientHelloConn) Read(b []byte) (int, error) {
-	n, err := c.tlsConn.Read(b)
+	n, err := c.TlsConn.Read(b)
 	if err == nil {
 		if c.hasCompleteClientHello() {
 			c.vlogf("got %d bytes, but client hello is already mature, skipping hijack", n)
@@ -128,16 +128,16 @@ func (c *HijackClientHelloConn) vlogf(format string, args ...any) {
 implement net.Conn begin ...
 */
 
-func (c *HijackClientHelloConn) Write(b []byte) (n int, err error) { return c.tlsConn.Write(b) }
-func (c *HijackClientHelloConn) Close() error                      { return c.tlsConn.Close() }
-func (c *HijackClientHelloConn) LocalAddr() net.Addr               { return c.tlsConn.LocalAddr() }
-func (c *HijackClientHelloConn) RemoteAddr() net.Addr              { return c.tlsConn.RemoteAddr() }
-func (c *HijackClientHelloConn) SetDeadline(t time.Time) error     { return c.tlsConn.SetDeadline(t) }
+func (c *HijackClientHelloConn) Write(b []byte) (n int, err error) { return c.TlsConn.Write(b) }
+func (c *HijackClientHelloConn) Close() error                      { return c.TlsConn.Close() }
+func (c *HijackClientHelloConn) LocalAddr() net.Addr               { return c.TlsConn.LocalAddr() }
+func (c *HijackClientHelloConn) RemoteAddr() net.Addr              { return c.TlsConn.RemoteAddr() }
+func (c *HijackClientHelloConn) SetDeadline(t time.Time) error     { return c.TlsConn.SetDeadline(t) }
 func (c *HijackClientHelloConn) SetReadDeadline(t time.Time) error {
-	return c.tlsConn.SetReadDeadline(t)
+	return c.TlsConn.SetReadDeadline(t)
 }
 func (c *HijackClientHelloConn) SetWriteDeadline(t time.Time) error {
-	return c.tlsConn.SetWriteDeadline(t)
+	return c.TlsConn.SetWriteDeadline(t)
 }
 
 /*
