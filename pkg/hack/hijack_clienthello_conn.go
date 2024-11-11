@@ -20,8 +20,8 @@ var (
 )
 
 type HijackClientHelloConn struct {
-	// internal tls.Conn
-	TlsConn net.Conn
+	// internal transport layer connection
+	TransportConn net.Conn
 
 	// client hello stored in buf
 	buf bytes.Buffer
@@ -35,12 +35,12 @@ type HijackClientHelloConn struct {
 
 func NewHijackClientHelloConn(conn net.Conn) *HijackClientHelloConn {
 	return &HijackClientHelloConn{
-		TlsConn: conn,
+		TransportConn: conn,
 	}
 }
 
 func (c *HijackClientHelloConn) Read(b []byte) (int, error) {
-	n, err := c.TlsConn.Read(b)
+	n, err := c.TransportConn.Read(b)
 	if err == nil {
 		if c.hasCompleteClientHello() {
 			c.vlogf("got %d bytes, but client hello is already mature, skipping hijack", n)
@@ -128,16 +128,16 @@ func (c *HijackClientHelloConn) vlogf(format string, args ...any) {
 implement net.Conn begin ...
 */
 
-func (c *HijackClientHelloConn) Write(b []byte) (n int, err error) { return c.TlsConn.Write(b) }
-func (c *HijackClientHelloConn) Close() error                      { return c.TlsConn.Close() }
-func (c *HijackClientHelloConn) LocalAddr() net.Addr               { return c.TlsConn.LocalAddr() }
-func (c *HijackClientHelloConn) RemoteAddr() net.Addr              { return c.TlsConn.RemoteAddr() }
-func (c *HijackClientHelloConn) SetDeadline(t time.Time) error     { return c.TlsConn.SetDeadline(t) }
+func (c *HijackClientHelloConn) Write(b []byte) (n int, err error) { return c.TransportConn.Write(b) }
+func (c *HijackClientHelloConn) Close() error                      { return c.TransportConn.Close() }
+func (c *HijackClientHelloConn) LocalAddr() net.Addr               { return c.TransportConn.LocalAddr() }
+func (c *HijackClientHelloConn) RemoteAddr() net.Addr              { return c.TransportConn.RemoteAddr() }
+func (c *HijackClientHelloConn) SetDeadline(t time.Time) error     { return c.TransportConn.SetDeadline(t) }
 func (c *HijackClientHelloConn) SetReadDeadline(t time.Time) error {
-	return c.TlsConn.SetReadDeadline(t)
+	return c.TransportConn.SetReadDeadline(t)
 }
 func (c *HijackClientHelloConn) SetWriteDeadline(t time.Time) error {
-	return c.TlsConn.SetWriteDeadline(t)
+	return c.TransportConn.SetWriteDeadline(t)
 }
 
 /*
