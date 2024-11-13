@@ -37,10 +37,18 @@ type HTTP2FingerprintingFrames struct {
 
 	// HEADERS frame
 	Headers []HeaderField
+
+	// cached fingerprint
+	fingerprint string
 }
 
 // TODO: add tests
 func (f *HTTP2FingerprintingFrames) String() string {
+
+	if f.fingerprint != "" {
+		return f.fingerprint
+	}
+
 	var buf bytes.Buffer
 
 	// SETTINGS frame
@@ -96,5 +104,7 @@ func (f *HTTP2FingerprintingFrames) String() string {
 		}
 	}
 
-	return buf.String()
+	f.fingerprint = buf.String()
+
+	return f.fingerprint
 }
